@@ -2,6 +2,9 @@
 # !/usr/bin/python3
 from itertools import count
 
+# DOCUMENTATION IS A WIP, YOU MIGHT WANT TO SEE THE SUNFISH ENGINE FOR CLEANER, SIMPLER AND FASTER CODE WITH DOCUMENTATION.
+# IF YOU FIND ANY BUG, PLEASE TELL ME, SO I CAN FIX IT :D
+
 # These constants will stay the same, they are used to initialize the board when we enter a new position
 a1, h1, a8, h8 = 91, 98, 21, 28
 N, E, W, S = -10, 1, -1, 10
