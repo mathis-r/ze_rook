@@ -10,7 +10,7 @@ I made this engine because I wanted to know how they work, if you want to do the
 - [The Chess Programming Wiki](https://www.chessprogramming.org/Main_Page), where basically every concept is explained
 
 ## Features
-- 10x12 board, to stop pieces from going out of the board : they go on the padding instead
+- [10x12 board](https://www.chessprogramming.org/10x12_Board), to stop pieces from going out of the board : they go on the padding instead
 - Uses the [AlphaBeta](https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework) algorithm, in a negamax framework
 - Evaluate a position with [pieces value](https://www.chessprogramming.org/Material), and a [Piece Square Table](https://www.chessprogramming.org/Piece-Square_Tables)
 - Written in Python
