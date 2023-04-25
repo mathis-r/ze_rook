@@ -24,3 +24,7 @@ I made this engine because I wanted to know how they work, if you want to do the
 I can only recommand you to see [Sunfish](https://github.com/thomasahle/sunfish), and its ports in [Rust](https://github.com/Recursing/sunfish_rs) or [Go](https://github.com/zserge/carnatus). This engine is more a proof a concept than anything, but at least it "works"
 
 The name ZE_ROOK comes from a meme : "*...and the idea is to sacrifice* ***THE ROOOOOOK!***"
+<audio controls>
+  <source src="the-rook.mp3" type="audio/mp3">
+Your browser does not support the audio element.
+</audio>
