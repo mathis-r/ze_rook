@@ -29,8 +29,8 @@ ibc = [0,0]
 iep = 0
 ikp = 0
 
-# Variables (unlike constants above, they will change)
-global tt # The transposition table
+# Variables (unlike constants above, they will change as the game progress)
+global tt # The transposition table, used to keep the best move of each position we've been through
 tt = {}
 
 position = (
@@ -340,8 +340,13 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
                 if score > alpha:
                     alpha = score
         if len(score_m) == 0:
-            alpha = -MATELOWER
-            bestmove = None
+            newpos = rotate(position, wc[:], bc[:], ep, kp)
+            if search_check(newpos[0], 0) == 1: # if the position is mate
+                alpha = -MATELOWER + 4 - depth # mate - nb of moves to get there => get to the mate as fast as possible
+                bestmove = None
+            else:                           # if the position is stalemate
+                alpha = 0
+                bestmove = None
         else:
             maxscore = max(score_m)
             indexmax = score_m.index(maxscore)
@@ -351,7 +356,6 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
     return alpha, bestmove
 
 # UCI implementation
-
 MATEUPPER = value("K") + 10 * value("Q")
 MATELOWER = value("K") - 10 * value("Q")
 
