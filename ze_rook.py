@@ -228,14 +228,15 @@ def move(position, move, wc, bc, ep, kp):
             kp = (j+i)//2
             listpos[h1], listpos[kp] = listpos[kp], listpos[h1]
     if piece == "P":
+        if j+S == ep:
+            listpos[j+S] = "."
+            ep = 0
+        ep = 0 # else if only "standard" pawn moves are played, ep stay the same, and it could result in illegal moves. So we set it to 0 here.
         if a8 <= j <= h8:
             listpos[i] = prom
             ep = 0
         if j-i == N+N:
-            ep = i+N+N
-        if j+S == ep:
-            listpos[j+S] = "."
-            ep = 0
+            ep = j
     else:
         ep = 0
     listpos[i], listpos[j] = ".", listpos[i]
