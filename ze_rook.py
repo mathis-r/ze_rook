@@ -536,11 +536,12 @@ while True:
                     depthmax = 1
                 print(perft(depthmax, position, wc[:], bc[:], ep, kp))
                 continue
-        wtime, btime, winc, binc = 4000, 4000, 0, 0
+        wtime, winc = 60, 0
         if len(args) >= 5:
-            wtime, btime, winc, binc = [int(a) / 1000 for a in args[1:5]]
-        if color == 'b':
-            wtime, winc = btime, binc
+            wtime, winc = [int(a) / 1000 for a in args[2::2]]
+        elif len(args) >= 3:
+            wtime = int(args[2]) / 1000
+        print(wtime, winc)
         think = min(wtime / 40 + winc, wtime / 2 - 1)
         start = time.time()
         move_str = None
