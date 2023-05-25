@@ -1,6 +1,7 @@
 #!/usr/bin/pypy3
 # !/usr/bin/python3
 from itertools import count
+import time
 
 # DOCUMENTATION IS A WIP, YOU MIGHT WANT TO SEE THE SUNFISH ENGINE FOR CLEANER, SIMPLER AND FASTER CODE WITH DOCUMENTATION.
 # IF YOU FIND ANY BUG, PLEASE TELL ME, SO I CAN FIX IT :D
@@ -24,6 +25,7 @@ initial_position = (
     '         \n'
  )
 
+global depthmax
 iwc = [0,0]
 ibc = [0,0]
 iep = 0
@@ -172,6 +174,35 @@ def value(piece):
     else:
         return 0
 
+def partition(array, low, high, mv_or_lv):
+    pivot = value(array[high][mv_or_lv])
+    i = low - 1
+    for j in range(low, high):
+        if value(array[j][mv_or_lv]) < pivot:
+            i = i + 1
+            (array[i], array[j]) = (array[j], array[i])
+    (array[i + 1], array[high]) = (array[high], array[i + 1])
+    return i + 1
+ 
+def quicksort(array, low, high, mv_or_lv):
+    if low < high:
+        pi = partition(array, low, high, mv_or_lv)
+        quicksort(array, low, pi - 1, mv_or_lv)
+        quicksort(array, pi + 1, high, mv_or_lv)
+
+def mvv_lva(move_list):
+    quicksort(move_list, 0, len(move_list) - 1, 3)
+    i=0
+    i_pre = 0
+    precedent = "0"
+    for i in range(len(move_list)):
+        if i != 0:
+            if move_list[i][3] != precedent:
+                quicksort(move_list, i_pre, i-1, 4)
+                i_pre = i
+        precedent = move_list[i][3]
+    return move_list
+
 def move_generation(position, wc, ep):
     """Generate an array with all possible moves of the board (pseudo legal moves)"""
     move_list = []
@@ -192,23 +223,23 @@ def move_generation(position, wc, ep):
                             break
                         if a8 <= j <= h8:
                             for p in "QRBN":
-                                move_list.append([i, j, p, destination])
+                                move_list.append([i, j, p, destination, piece])
                             break
-                    move_list.append([i, j, "", destination])
+                    move_list.append([i, j, "", destination, piece])
                     if piece in "PNK" or destination.islower():
                         break
                     if i == a1 and position[j + E] == "K" and wc[0] == 0:
-                        move_list.append([j + E, j + W, "", destination])
+                        move_list.append([j + E, j + W, "", destination, piece])
                     if i == h1 and position[j + W] == "K" and wc[1] == 0:
-                        move_list.append([j + W, j + E, "", destination])
-    return move_list
+                        move_list.append([j + W, j + E, "", destination, piece])
+    return mvv_lva(move_list)
 
 def move(position, move, wc, bc, ep, kp):
     """Apply a move on a position"""
     listpos = list(position)
     i, j = move[0], move[1]
     prom = move[2]
-    piece = listpos[i]
+    piece = position[i]
     kp = 0
     if i == a1:
         wc[0] = 1
@@ -286,9 +317,8 @@ def search_check(position, kp):
                 return 1
     return 0
 
-def evaluate_mv(position, move, ep):
-    i, j, prom, destination = move
-    piece = position[i]
+def evaluate_mv(move, ep):
+    i, j, prom, destination, piece = move
     score = pst[piece][j] - pst[piece][i]
     if destination.islower() == True:
         score += pst[destination.swapcase()][119-j]
@@ -316,19 +346,24 @@ def evaluate_pos(position):
 
 # Search
 def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
-    """AlphaBeta algorithm, in a negamax framework, without quiescence search, iterative deepening"""
+    """AlphaBeta algorithm, in a negamax framework, without quiescence search"""
     """Will try to find the best move on the board"""
+    bestmove = None
     if depth == 0:
         return evaluate_pos(position), None #In the future, I might add quiescence search to the engine, so that it doesn't blunder to much.
     killer = tt.get(str(position))
-    move_list = move_generation(position, wc[:], ep)
-    if killer:
-        alpha = evaluate_pos(position) + evaluate_mv(position, killer, ep)
-        bestmove = killer
+    if not killer:
+        killer = [[0, 0, "", " ", " "], -1, 0]
+    if killer[1] >= depth or killer[2] >= MATELOWER - 15:
+        alpha = evaluate_pos(position) + evaluate_mv(killer[0], ep)
+        bestmove = killer[0]
     else:
         moves = []
         score_m = []
         move_list = move_generation(position, wc[:], ep)
+        for i in range(len(move_list)): # Move ordering : the PV move
+            if killer == move_list[i]:
+                move_list.insert(0, move_list.pop(i))
         for i in range(len(move_list)):
             testmove = move(position, move_list[i], wc[:], bc[:], ep, kp)
             newpos = rotate(testmove[0], testmove[1], testmove[2], testmove[3], testmove[4])
@@ -343,7 +378,7 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
         if len(score_m) == 0:
             newpos = rotate(position, wc[:], bc[:], ep, kp)
             if search_check(newpos[0], 0) == 1: # if the position is mate
-                alpha = -MATELOWER + 4 - depth # mate - nb of moves to get there => get to the mate as fast as possible
+                alpha = -MATELOWER + depthmax - depth # mate - nb of moves to get there => get to the mate as fast as possible
                 bestmove = None
             else:                           # if the position is stalemate
                 alpha = 0
@@ -351,10 +386,30 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
         else:
             maxscore = max(score_m)
             indexmax = score_m.index(maxscore)
-            if depth > 2:
-                tt[str(position)] = moves[indexmax]
+            tt[str(position)] = [moves[indexmax],depth, maxscore]
             bestmove = moves[indexmax]
     return alpha, bestmove
+
+# Perft algorithm
+def perft(depth, position, wc, bc, ep, kp):
+    n_moves = 0
+    nodes = 0
+    move_list = move_generation(position, wc[:], ep)
+    legalmove = []
+    for i in range(len(move_list)):
+        testmove = move(position, move_list[i], wc[:], bc[:], ep, kp)
+        newpos = rotate(testmove[0], testmove[1], testmove[2], testmove[3], testmove[4])
+        if search_check(newpos[0], newpos[4]) == 0:
+            legalmove.append(testmove)
+            #print(testmove[0])
+    n_moves = len(legalmove)
+    if depth == 1:
+        return n_moves
+    i=0
+    for i in range(n_moves):
+        pos = rotate(legalmove[i][0], legalmove[i][1], legalmove[i][2], legalmove[i][3], legalmove[i][4])
+        nodes += perft(depth-1, pos[0], pos[1], pos[2], pos[3], pos[4])
+    return nodes
 
 # UCI implementation
 MATEUPPER = value("K") + 10 * value("Q")
@@ -411,7 +466,7 @@ def render(i):
 while True:
     args = input().split()
     if args[0] == "uci":
-        print("id name ZE_ROOK v0.1")
+        print("id name ZE_ROOK v0.2")
         print("uciok")
 
     elif args[0] == "isready":
@@ -473,35 +528,33 @@ while True:
         kp = 0
 
     elif args[0] == "go":
+        if len(args) >= 3:
+            if args[1] == "perft":
+                if args[2] in "123456789":
+                    depthmax = int(args[2])
+                else:
+                    depthmax = 1
+                print(perft(depthmax, position, wc[:], bc[:], ep, kp))
+                continue
+        wtime, btime, winc, binc = 4000, 4000, 0, 0
+        if len(args) >= 5:
+            wtime, btime, winc, binc = [int(a) / 1000 for a in args[1:5]]
+        if color == 'b':
+            wtime, winc = btime, binc
+        think = min(wtime / 40 + winc, wtime / 2 - 1)
+        start = time.time()
         move_str = None
-        scmv = alphabeta(-MATEUPPER, MATEUPPER, 4, position, wc[:], bc[:], ep, kp)
-        move_bfr_str = scmv[1]
-        if move_bfr_str == None:
-            break
+        for depthmax in range(1,1000): # Iterative deepening
+            scmv = alphabeta(-MATEUPPER, MATEUPPER, depthmax, position, wc[:], bc[:], ep, kp)
+            move_bfr_str = scmv[1]
+            print(depthmax)
+            if move_bfr_str == None:
+                break
+            if move_bfr_str and time.time() - start > think * 0.8:
+                break
         i, j = move_bfr_str[0], move_bfr_str[1]
         if color  == 'b':
             i, j = 119 - i, 119 - j
         move_str = render(i) + render(j) + move_bfr_str[2].lower()
 
         print("bestmove", move_str or '(none)')
-
-# Perft algorithm
-def perft(depth, position, wc, bc, ep, kp):
-    n_moves = 0
-    nodes = 0
-    move_list = move_generation(position, wc[:], ep)
-    legalmove = []
-    for i in range(len(move_list)):
-        testmove = move(position, move_list[i], wc[:], bc[:], ep, kp)
-        newpos = rotate(testmove[0], testmove[1], testmove[2], testmove[3], testmove[4])
-        if search_check(newpos[0], newpos[4]) == 0:
-            legalmove.append(testmove)
-            print(testmove[0])
-    n_moves = len(legalmove)
-    if depth == 1:
-        return n_moves
-    i=0
-    for i in range(n_moves):
-        pos = rotate(legalmove[i][0], legalmove[i][1], legalmove[i][2], legalmove[i][3], legalmove[i][4])
-        nodes += perft(depth-1, pos[0], pos[1], pos[2], pos[3], pos[4])
-    return nodes
