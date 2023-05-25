@@ -536,19 +536,19 @@ while True:
                     depthmax = 1
                 print(perft(depthmax, position, wc[:], bc[:], ep, kp))
                 continue
-        wtime, winc = 60, 0
-        if len(args) >= 5:
-            wtime, winc = [int(a) / 1000 for a in args[2::2]]
+        wtime, btime, winc, binc = 60, 60, 0, 0
+        if len(args) >= 9:
+            wtime, btime, winc, binc = [int(a) / 1000 for a in args[2::2]]
         elif len(args) >= 3:
             wtime = int(args[2]) / 1000
-        print(wtime, winc)
+        if color == 'b':
+            wtime, btime, winc, binc = btime, wtime, binc, winc
         think = min(wtime / 40 + winc, wtime / 2 - 1)
         start = time.time()
         move_str = None
         for depthmax in range(1,1000): # Iterative deepening
             scmv = alphabeta(-MATEUPPER, MATEUPPER, depthmax, position, wc[:], bc[:], ep, kp)
             move_bfr_str = scmv[1]
-            print(depthmax)
             if move_bfr_str == None:
                 break
             if move_bfr_str and time.time() - start > think * 0.8:
