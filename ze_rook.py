@@ -50,6 +50,8 @@ position = (
     '         \n'
  )
 
+global move_prv_iter
+move_prv_iter = None
 wc = [0,0]
 bc = [0,0]
 ep = 0
@@ -349,6 +351,8 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
     """AlphaBeta algorithm, in a negamax framework, without quiescence search"""
     """Will try to find the best move on the board"""
     bestmove = None
+    if time.time() - start > think * 0.8 and move_prv_iter:
+        return 0, "out_of_time"
     if depth == 0:
         return evaluate_pos(position), None #In the future, I might add quiescence search to the engine, so that it doesn't blunder to much.
     killer = tt.get(str(position))
@@ -368,7 +372,10 @@ def alphabeta(alpha, beta, depth, position, wc, bc, ep, kp):
             testmove = move(position, move_list[i], wc[:], bc[:], ep, kp)
             newpos = rotate(testmove[0], testmove[1], testmove[2], testmove[3], testmove[4])
             if search_check(newpos[0], newpos[4]) == 0:
-                score = - alphabeta(-beta, -alpha, depth - 1, newpos[0], newpos[1], newpos[2], newpos[3], newpos[4])[0]
+                scmv = alphabeta(-beta, -alpha, depth - 1, newpos[0], newpos[1], newpos[2], newpos[3], newpos[4])
+                score = -scmv[0]
+                if scmv[1] == "out_of_time":
+                    return 0, "out_of_time"
                 moves.append(move_list[i])
                 score_m.append(score)
                 if score >= beta:
@@ -551,8 +558,11 @@ while True:
             move_bfr_str = scmv[1]
             if move_bfr_str == None:
                 break
+            if move_bfr_str == "out_of_time":
+                move_bfr_str = move_prv_iter
             if move_bfr_str and time.time() - start > think * 0.8:
                 break
+            move_prv_iter = move_bfr_str
         i, j = move_bfr_str[0], move_bfr_str[1]
         if color  == 'b':
             i, j = 119 - i, 119 - j
