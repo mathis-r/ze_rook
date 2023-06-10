@@ -546,10 +546,10 @@ while True:
         wtime, btime, winc, binc = 60, 60, 0, 0
         if len(args) >= 9:
             wtime, btime, winc, binc = [int(a) / 1000 for a in args[2::2]]
+            if color == 'b':
+                wtime, btime, winc, binc = btime, wtime, binc, winc
         elif len(args) >= 3:
             wtime = int(args[2]) / 1000
-        if color == 'b':
-            wtime, btime, winc, binc = btime, wtime, binc, winc
         think = min(wtime / 40 + winc, wtime / 2 - 1)
         start = time.time()
         move_str = None
