@@ -21,7 +21,7 @@ pub fn alphabeta(boardstate: &mut BoardState, mut alpha: i32, beta: i32, depth: 
         None => killer = Some(&(Move {from: 0, to: 0, prom: None}, -1, -MATEUPPER)),
         Some((Move { from, to, prom }, killer_depth, killerscore)) => {
             if killer_depth > & (depth as i32)  || killerscore >= &(MATELOWER - 15) {
-                alpha = boardstate.evaluate_pos() + Move{ from: *from, to: *to, prom: *prom}.evaluate_mv(boardstate);
+                alpha = *killerscore;
                 bestmove = Some(Move{ from: *from, to: *to, prom: *prom});
                 return (alpha, bestmove);
             }
