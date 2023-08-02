@@ -2,12 +2,13 @@ use crate::piece::Square;
 use crate::BoardState;
 use ze_rook::A1;
 
-pub fn fen(fen_str: String) -> (BoardState, String){
+pub fn fen(fen_str: String) -> BoardState {
     let mut boardstate = BoardState::new();
     let parts: Vec<&str> = fen_str.split(' ').collect();
     let rows: Vec<&str> = parts[0].split('/').collect();
     if rows.len() != 8 {
-        return (boardstate, "FEN should have 8 rows".to_string());
+        println!("FEN string should have 8 rows");
+        return boardstate;
     }
     for r in 0..8 {
         let mut index = r*10 +21;
@@ -110,7 +111,8 @@ pub fn fen(fen_str: String) -> (BoardState, String){
                     }
                 }
                 _ => {
-                    return (boardstate, "Invalid FEN string".to_string());
+                    println!("Invalid FEN string");
+                    return BoardState::new();
                 },
             }
         }
@@ -136,7 +138,7 @@ pub fn fen(fen_str: String) -> (BoardState, String){
     if color == "b" {
         boardstate.rotate();
     }
-    (boardstate, color.to_string())
+    boardstate
 }
 
 pub fn parse(s: String) -> i64 {

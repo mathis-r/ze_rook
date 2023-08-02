@@ -22,7 +22,6 @@ fn main() {
     let (mut wtime, mut winc) = (60000, 0);
     let (mut btime, mut binc): (i64, i64);
     let mut boardstate = BoardState::new();
-    let mut color = "w".to_string();
     loop {
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read line");
@@ -33,22 +32,13 @@ fn main() {
         } else if args[0] == "isready" {
             println!("readyok");
         } else if args[0] == "d" || args[0] == "print" {
-            if color == "b" {
-                boardstate.rotate();
-                boardstate.print();
-                println!("{color}");
-                boardstate.rotate();
-            } else {
-                boardstate.print();
-                println!("{color}");
-            }
+            boardstate.print();
         } else if args[0] == "quit" {
             break;
         } else if args[0] == "ucinewgame" {
             tt.clear();
             tt.shrink_to_fit();
             boardstate = BoardState::new();
-            color = "w".to_string();
         } else if args[0] == "go" {
             if args.len() >= 3 {
                 if args[1] == "perft" {
@@ -64,7 +54,7 @@ fn main() {
                         "9" => 9,
                         _ => 0,
                     };
-                    println!("Nodes searched: {}", perft(&depthmax, &depthmax, &mut boardstate, &color));
+                    println!("Nodes searched: {}", perft(&depthmax, &depthmax, &mut boardstate));
                     continue;
                 }
             }
@@ -85,7 +75,7 @@ fn main() {
                     Ok(num) => num,
                     Err(_) => panic!("Black time increment error: not a number"),
                 };
-                if color == "b" {
+                if boardstate.color == 'b' {
                     (wtime, winc) = (btime, binc);
                 }
             } else if args.len() >= 3 {
@@ -112,7 +102,7 @@ fn main() {
                     Some(mv) => {
                         move_prv_iter = move_bfr_string;
                         let (mut i, mut j) = (mv.from, mv.to);
-                        if color == "b" {
+                        if boardstate.color == 'b' {
                             (i, j) = (119-i, 119-j);
                         }
                         let prom = match mv.prom {
@@ -131,7 +121,7 @@ fn main() {
             match move_bfr_string {
                 Some(mv) => {
                     let (mut i, mut j) = (mv.from, mv.to);
-                    if color == "b" {
+                    if boardstate.color == 'b' {
                         (i, j) = (119-i, 119-j);
                     }
                     let prom = match mv.prom {
@@ -149,7 +139,6 @@ fn main() {
         } else if args.len() >=2 {
             if args[..2] == ["position", "startpos"] {
                 boardstate = BoardState::new();
-                color = "w".to_string();
                 if args.len() > 3 {
                     if args[2] == "moves" {
                         let mut final_ply = 0;
@@ -162,7 +151,7 @@ fn main() {
                                 "n" => Some(Prom::N),
                                 _ => None,
                             };
-                            if color == "b" {
+                            if boardstate.color == 'b' {
                                 (i, j) = (119 - i, 119 -j);
                             }
                             if ply % 2 == 1 {
@@ -175,12 +164,10 @@ fn main() {
                             }
                             final_ply = ply
                         }
-                        if final_ply % 2 == 0 && color == "w" {
+                        if final_ply % 2 == 0 && boardstate.color == 'w' {
                             boardstate.rotate();
-                            color = "b".to_string();
-                        } else if final_ply % 2 == 0 && color == "b" {
+                        } else if final_ply % 2 == 0 && boardstate.color == 'b' {
                             boardstate.rotate();
-                            color = "w".to_string();
                         }
                     }
                     boardstate.kp = 0;
@@ -193,7 +180,7 @@ fn main() {
                 for i in 0..args[2..8].len() {
                     fen_str = fen_str.to_owned() + args[2..8][i] + " ";
                 }
-                (boardstate, color) = fen(fen_str);
+                boardstate = fen(fen_str);
                 if args.len() >= 9 {
                     if args[8] == "moves" {
                         let mut final_ply = 0;
@@ -206,7 +193,7 @@ fn main() {
                                 "n" => Some(Prom::N),
                                 _ => None,
                             };
-                            if color == "b" {
+                            if boardstate.color == 'b' {
                                 (i, j) = (119 - i, 119 -j);
                             }
                             if ply % 2 == 1 {
@@ -219,12 +206,10 @@ fn main() {
                             }
                             final_ply = ply;
                         }
-                        if final_ply % 2 == 0 && color == "w" {
+                        if final_ply % 2 == 0 && boardstate.color == 'w' {
                             boardstate.rotate();
-                            color = "b".to_string();
-                        } else if final_ply % 2 == 0 && color == "b" {
+                        } else if final_ply % 2 == 0 && boardstate.color == 'b' {
                             boardstate.rotate();
-                            color = "w".to_string();
                         }
                     }
                     boardstate.kp = 0;

@@ -2,7 +2,7 @@ use crate::piece::Prom;
 use crate::BoardState;
 use crate::render;
 
-pub fn perft(depth: &usize, depthperft: &usize, boardstate: &mut BoardState, color: &String) -> usize{
+pub fn perft(depth: &usize, depthperft: &usize, boardstate: &mut BoardState) -> usize{
     if *depth == 0 {
         return 1;
     }
@@ -17,10 +17,10 @@ pub fn perft(depth: &usize, depthperft: &usize, boardstate: &mut BoardState, col
         boardstate.apply_move(&movelist[i]);
         boardstate.rotate();
         if !boardstate.search_check() {
-            let subnodes = perft(&(depth - 1), depthperft, boardstate, &color);
+            let subnodes = perft(&(depth - 1), depthperft, boardstate);
             if depth == depthperft {
                 let (mut k, mut j) = (movelist[i].from as i32,movelist[i].to as i32);
-                if color == "b" {
+                if boardstate.color == 'b' {
                     (k, j) = (119 - k, 119 - j);
                 }
                 let prom = match movelist[i].prom {
@@ -50,31 +50,31 @@ mod tests {
     #[test]
     fn perft_test_startpos() {
         let mut boardstate = BoardState::new();
-        assert_eq!(perft(&4, &4, &mut boardstate, &"w".to_string()), 197281);
+        assert_eq!(perft(&4, &4, &mut boardstate), 197281);
     }
     #[test]
     fn perft_test_pos2() {
-        let (mut boardstate, _) = crate::fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1".to_string());
-        assert_eq!(perft(&3, &3, &mut boardstate, &"w".to_string()), 97862);
+        let mut boardstate = crate::fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1".to_string());
+        assert_eq!(perft(&3, &3, &mut boardstate), 97862);
     }
     #[test]
     fn perft_test_pos3() {
-        let (mut boardstate, _) = crate::fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1".to_string());
-        assert_eq!(perft(&5, &5, &mut boardstate, &"w".to_string()), 674624);
+        let mut boardstate = crate::fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1".to_string());
+        assert_eq!(perft(&5, &5, &mut boardstate), 674624);
     }
     #[test]
     fn perft_test_pos4() {
-        let (mut boardstate, _) = crate::fen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1".to_string());
-        assert_eq!(perft(&4, &4, &mut boardstate, &"w".to_string()), 422333);
+        let mut boardstate = crate::fen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1".to_string());
+        assert_eq!(perft(&4, &4, &mut boardstate), 422333);
     }
     #[test]
     fn perft_test_pos5() {
-        let (mut boardstate, _) = crate::fen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8".to_string());
-        assert_eq!(perft(&3, &3, &mut boardstate, &"w".to_string()), 62379);
+        let mut boardstate = crate::fen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8".to_string());
+        assert_eq!(perft(&3, &3, &mut boardstate), 62379);
     }
     #[test]
     fn perft_test_pos6() {
-        let (mut boardstate, _) = crate::fen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10".to_string());
-        assert_eq!(perft(&3, &3, &mut boardstate, &"w".to_string()), 89890);
+        let mut boardstate = crate::fen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10".to_string());
+        assert_eq!(perft(&3, &3, &mut boardstate), 89890);
     }
 }

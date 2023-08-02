@@ -149,13 +149,19 @@ pub struct BoardState {
     pub oppc: (bool, bool),
     pub ep: usize,
     pub kp: usize,
+    pub color: char,
 }
 
 impl BoardState {
     pub fn new() -> BoardState {
-        BoardState {board: INITIAL_BOARD, myc: (true, true), oppc: (true, true), ep: 0, kp: 0 }
+        BoardState {board: INITIAL_BOARD, myc: (true, true), oppc: (true, true), ep: 0, kp: 0, color: 'w' }
     }
-    pub fn print(&self) {
+    pub fn print(&mut self) {
+        let mut change = false;
+        if self.color == 'b' {
+            change = true;
+            self.rotate();
+        }
         let mut boardtoprint = String::new();
         for square in 0..120 {
             if square % 10 == 9 {
@@ -181,7 +187,11 @@ impl BoardState {
             }
         }
         println!("{}", boardtoprint);
-        println!("myc : {:?} | oppc : {:?} | ep : {} | kp : {}", self.myc, self.oppc, self.ep, self.kp);
+        println!("white castling : {:?} | black castling : {:?} | ep : {} | kp : {}", self.myc, self.oppc, self.ep, self.kp);
+        if change {
+            self.rotate();
+        }
+        println!("Side to move : {}", self.color);
     }
     pub fn rotate(&mut self) {
         self.ep = 119 - self.ep;
@@ -189,6 +199,11 @@ impl BoardState {
         (self.myc, self.oppc) = (self.oppc, self.myc);
         for i in 0..60 {
             (self.board[119-i], self.board[i]) = (self.board[i].swap_color(), self.board[119-i].swap_color());
+        }
+        self.color = match self.color {
+            'w' => 'b',
+            'b' => 'w',
+            _ => 'w',
         }
     }
     pub fn apply_move(&mut self, mv: &Move) {
