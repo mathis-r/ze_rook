@@ -18,6 +18,8 @@ pub fn perft(depth: &usize, depthperft: &usize, boardstate: &mut BoardState) -> 
         boardstate.rotate();
         if !boardstate.search_check() {
             let subnodes = perft(&(depth - 1), depthperft, boardstate);
+            boardstate.rotate();
+            boardstate.unmake(&movelist[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
             if depth == depthperft {
                 let (mut k, mut j) = (movelist[i].from as i32,movelist[i].to as i32);
                 if boardstate.color == 'b' {
@@ -36,9 +38,10 @@ pub fn perft(depth: &usize, depthperft: &usize, boardstate: &mut BoardState) -> 
                 println!("{lmove}: {}", subnodes);
             }
             nodes += subnodes
+        } else {
+            boardstate.rotate();
+            boardstate.unmake(&movelist[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
         }
-        boardstate.rotate();
-        boardstate.unmake(&movelist[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
     }
     nodes
 }
