@@ -378,6 +378,7 @@ impl BoardState {
                     for i in 0..self.w_pos_table.len() {
                         if self.w_pos_table[i] == A1 {
                             self.w_pos_table.swap_remove(i);
+                            break;
                         }
                     }
                     self.w_pos_table.push(self.kp);
@@ -385,6 +386,7 @@ impl BoardState {
                     for i in 0..self.b_pos_table.len() {
                         if self.b_pos_table[i] == A1 {
                             self.b_pos_table.swap_remove(i);
+                            break;
                         }
                     }
                     self.b_pos_table.push(self.kp);
@@ -397,6 +399,7 @@ impl BoardState {
                     for i in 0..self.w_pos_table.len() {
                         if self.w_pos_table[i] == H1 {
                             self.w_pos_table.swap_remove(i);
+                            break;
                         }
                     }
                     self.w_pos_table.push(self.kp);
@@ -404,6 +407,7 @@ impl BoardState {
                     for i in 0..self.b_pos_table.len() {
                         if self.b_pos_table[i] == H1 {
                             self.b_pos_table.swap_remove(i);
+                            break;
                         }
                     }
                     self.b_pos_table.push(self.kp);
