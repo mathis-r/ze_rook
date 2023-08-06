@@ -120,6 +120,9 @@ fn main() {
                         },
                     None => break,
                 }
+                boardstate.rotate();
+                boardstate.gen_captures();
+                boardstate.rotate();
             }
             match move_bfr_string {
                 Some(mv) => {
