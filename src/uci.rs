@@ -10,56 +10,72 @@ pub fn fen(fen_str: String) -> BoardState {
         println!("FEN string should have 8 rows");
         return boardstate;
     }
+    boardstate.w_pos_table.clear();
+    boardstate.b_pos_table.clear();
     for r in 0..8 {
         let mut index = r*10 +21;
         for p in rows[r].chars() {
             match p {
                 'K' => {
                     boardstate.board[index] = Square::MyKing;
+                    boardstate.w_pos_table.push(index);
+                    boardstate.my_king = index;
                     index+=1;
                 },
                 'Q' => {
                     boardstate.board[index] = Square::MyQueen;
+                    boardstate.w_pos_table.push(index);
                     index+=1;
                 },
                 'R' => {
                     boardstate.board[index] = Square::MyRook;
+                    boardstate.w_pos_table.push(index);
                     index+=1;
                 },
                 'B' => {
                     boardstate.board[index] = Square::MyBishop;
+                    boardstate.w_pos_table.push(index);
                     index+=1;
                 },
                 'N' => {
                     boardstate.board[index] = Square::MyKnight;
+                    boardstate.w_pos_table.push(index);
                     index+=1;
                 },
                 'P' => {
                     boardstate.board[index] = Square::MyPawn;
+                    boardstate.w_pos_table.push(index);
                     index+=1;
                 },
                 'k' => {
                     boardstate.board[index] = Square::OpponentKing;
+                    boardstate.b_pos_table.push(119 - index);
+                    boardstate.opp_king = index;
                     index+=1;
                 },
                 'q' => {
                     boardstate.board[index] = Square::OpponentQueen;
+                    boardstate.b_pos_table.push(119 - index);
                     index+=1;
                 },
                 'r' => {
                     boardstate.board[index] = Square::OpponentRook;
+                    boardstate.b_pos_table.push(119 - index);
                     index+=1;
                 },
                 'b' => {
                     boardstate.board[index] = Square::OpponentBishop;
+                    boardstate.b_pos_table.push(119 - index);
                     index+=1;
                 },
                 'n' => {
                     boardstate.board[index] = Square::OpponentKnight;
+                    boardstate.b_pos_table.push(119 - index);
                     index+=1;
                 },
                 'p' => {
                     boardstate.board[index] = Square::OpponentPawn;
+                    boardstate.b_pos_table.push(119 - index);
                     index+=1;
                 },
                 '1' => {
@@ -136,6 +152,11 @@ pub fn fen(fen_str: String) -> BoardState {
         0
     };
     if color == "b" {
+        boardstate.gen_captures();
+        boardstate.rotate();
+    } else {
+        boardstate.rotate();
+        boardstate.gen_captures();
         boardstate.rotate();
     }
     boardstate

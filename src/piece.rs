@@ -237,7 +237,7 @@ impl Move {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum Prom {
     Q,
     R,

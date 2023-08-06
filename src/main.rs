@@ -27,7 +27,7 @@ fn main() {
         io::stdin().read_line(&mut input).expect("Failed to read line");
         let args: Vec<&str> = input.trim().split(' ').collect();
         if args[0] == "uci".to_string() {
-            println!("id name ZE_ROOK v0.3");
+            println!("id name ZE_ROOK v0.4");
             println!("uciok");
         } else if args[0] == "isready" {
             println!("readyok");
@@ -55,6 +55,9 @@ fn main() {
                         _ => 0,
                     };
                     println!("Nodes searched: {}", perft(&depthmax, &depthmax, &mut boardstate));
+                    boardstate.rotate();
+                    boardstate.gen_captures();
+                    boardstate.rotate();
                     continue;
                 }
             }

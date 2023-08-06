@@ -66,43 +66,40 @@ pub fn alphabeta(boardstate: &mut BoardState, mut alpha: i32, beta: i32, depth: 
         let ep = boardstate.ep;
         let kp = boardstate.kp;
         boardstate.apply_move(&move_list[i]);
+        //boardstate.gen_captures();
         boardstate.rotate();
-        if !boardstate.search_check() {
-            let scmv = alphabeta(boardstate, -beta, -alpha, depth-1, tt, depthmax, think, start, move_prv_iter);
-            let score = -scmv.0;
-            match scmv.0 {
-                999999 => {
+        let scmv = alphabeta(boardstate, -beta, -alpha, depth-1, tt, depthmax, think, start, move_prv_iter);
+        let score = -scmv.0;
+        match scmv.0 {
+            999999 => {
+                boardstate.rotate();
+                boardstate.unmake(&move_list[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
+                return (999999, None);
+            },
+            _ => {
+                moves.push(move_list[i]);
+                score_m.push(score);
+                if score >= beta {
                     boardstate.rotate();
                     boardstate.unmake(&move_list[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
-                    return (999999, None);
-                },
-                _ => {
-                    moves.push(move_list[i]);
-                    score_m.push(score);
-                    if score >= beta {
-                        boardstate.rotate();
-                        boardstate.unmake(&move_list[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
-                        return (beta, None);
-                    }
-                    if score > alpha {
-                        alpha = score;
-                    }
-                },
-            }
+                    return (beta, None);
+                }
+                if score > alpha {
+                    alpha = score;
+                }
+            },
         }
         boardstate.rotate();
         boardstate.unmake(&move_list[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
     }
     if score_m.len() == 0 {
-        boardstate.rotate();
-        if boardstate.search_check() {
+        if boardstate.checkers.0 != 0 && boardstate.checkers.0 != 119 {
             alpha = - MATELOWER + *depthmax as i32 - depth as i32;
             bestmove = None;
         } else {
             alpha = 0;
             bestmove = None;
         }
-        boardstate.rotate();
     } else {
             let maxscore = score_m.iter().max();
             let indexmax = score_m.iter().position(|&x| Some(x) == maxscore.copied());
