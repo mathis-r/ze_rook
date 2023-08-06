@@ -572,53 +572,16 @@ impl BoardState {
         self.kp = *kp;
     }
 
-    //pub fn search_check(&mut self) -> bool {
-    //    let mut king = 1;
-    //    for i in 0..120 {
-    //        if self.board[i] == Square::OpponentKing {
-    //            king = i;
-    //        }
-    //    }
-    //    if king == 1 {
-    //        return true;
-    //    }
-    //    let castling;
-    //    let king_ori = kingori(&self.kp);
-    //    if king_ori == 0 {
-    //        castling = false;
-    //    } else {
-    //        castling = true;
-    //    }
-    //    let move_list = self.gen_move();
-    //    for i in 0..move_list.len() {
-    //        if move_list[i].to == king || move_list[i].to == self.kp {
-    //            return true;
-    //        }
-    //        if castling {
-    //            if move_list[i].to == king_ori {
-    //                return true;
-    //            }
-    //        }
-    //    }
-    //    false
-    //}
-
     pub fn evaluate_pos(&mut self) -> i32 {
         let mut score = 0;
         for i in 0..self.w_pos_table.len() {
             let piece;
             if self.color == 'b' {
                 piece = self.board[119 - self.w_pos_table[i]];
-                //println!("{:?}", piece);
-                //println!("{}", - piece.swap_color().pst()[self.w_pos_table[i]]);
-                //println!("{}", self.w_pos_table[i]);
                 score += piece.value();
                 score -= piece.swap_color().pst()[self.w_pos_table[i]];
             } else {
                 piece = self.board[self.w_pos_table[i]];
-                //println!("{:?}", piece);
-                //println!("{}", piece.pst()[self.w_pos_table[i]]);
-                //println!("{}", self.w_pos_table[i]);
                 score += piece.value() + piece.pst()[self.w_pos_table[i]];
             }
         }
@@ -626,42 +589,13 @@ impl BoardState {
             let piece;
             if self.color == 'w' {
                 piece = self.board[119 - self.b_pos_table[i]];
-                //println!("{:?}", piece);
-                //println!("{}", - piece.swap_color().pst()[self.b_pos_table[i]]);
-                //println!("{}", self.b_pos_table[i]);
                 score += piece.value();
                 score -= piece.swap_color().pst()[self.b_pos_table[i]];
             } else {
                 piece = self.board[self.b_pos_table[i]];
-                //println!("{:?}", piece);
-                //println!("{}", piece.pst()[self.b_pos_table[i]]);
-                //println!("{}", self.b_pos_table[i]);
                 score += piece.value() + piece.pst()[self.b_pos_table[i]];
             }
         }
-        //println!("score");
-        //score = 0;
-        //for i in 0..120 {
-        //    let mut piece = self.board[i];
-        //    if piece.is_my_piece() {
-        //        score += piece.value() + piece.pst()[i];
-        //    } else if piece.is_opponent_piece() {
-        //        println!("{:?}", piece);
-        //        println!("{i}");
-        //        score += piece.value();
-        //        self.rotate();
-        //        piece = self.board[i];
-        //        self.rotate();
-        //        println!("{:?}", piece);
-        //        println!("{score}");
-        //        score = score - piece.pst()[119-i];
-        //        println!("{score}");
-        //    }
-        //    if piece != Square::Empty && piece != Square::NotOnTheBoard {
-        //        println!("{:?}", piece);
-        //        println!("{score}");
-        //    }
-        //}
         score
     }
 
@@ -1071,25 +1005,3 @@ fn promotion(prom: &Option<Prom>) -> Square {
         _ => Square::Empty,
     }
 }
-
-//fn kingori(kp: &usize) -> usize {
-//    let king_ori;
-//    match *kp {
-//        23 | 25 => {
-//            king_ori = 24;
-//        },
-//        24 | 26 => {
-//            king_ori = 25;
-//        },
-//        93 | 95 => {
-//            king_ori = 94;
-//        },
-//        94 | 96 => {
-//            king_ori = 95;
-//        },
-//        _ => {
-//            king_ori = 0;
-//        },
-//    };
-//    king_ori
-//}
