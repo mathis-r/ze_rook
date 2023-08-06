@@ -139,6 +139,9 @@ fn main() {
                 },
                 None => println!("bestmove (none)"),
             }
+            boardstate.rotate();
+            boardstate.gen_captures();
+            boardstate.rotate();
         } else if args.len() >=2 {
             if args[..2] == ["position", "startpos"] {
                 boardstate = BoardState::new();
