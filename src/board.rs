@@ -250,6 +250,8 @@ impl BoardState {
             else {
                 println!("Side to move : b");
             }
+        } else {
+            println!("Side to move : {}", self.color);
         }
         println!("Checkers : {} {}", render(self.checkers.0 as i32), render(self.checkers.1 as i32));
         println!("{:?}", self.pinned);
