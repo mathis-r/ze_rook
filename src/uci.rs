@@ -152,11 +152,11 @@ pub fn fen(fen_str: String) -> BoardState {
         0
     };
     if color == "b" {
-        boardstate.gen_captures();
+        boardstate.gen_att_map();
         boardstate.rotate();
     } else {
         boardstate.rotate();
-        boardstate.gen_captures();
+        boardstate.gen_att_map();
         boardstate.rotate();
     }
     boardstate

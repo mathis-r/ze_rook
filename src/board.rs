@@ -206,7 +206,7 @@ impl BoardState {
 
         let mut board = BoardState {board: INITIAL_BOARD, myc: (true, true), oppc: (true, true), ep: 0, kp: 0, color: 'w', w_pos_table, b_pos_table, my_attack_table, opp_attack_table, my_king, opp_king, pinned, checkers };
         board.rotate();
-        board.gen_captures();
+        board.gen_att_map();
         board.rotate();
         board
     }
@@ -477,7 +477,7 @@ impl BoardState {
             self.b_pos_table.push(mv.to);
         }
         (self.board[mv.from], self.board[mv.to]) = (Square::Empty, self.board[mv.from]);
-        self.gen_captures();
+        self.gen_att_map();
     }
 
     pub fn unmake(&mut self, mv: &Move, dest: &Square, ori_myc: &(bool, bool), ori_oppc: &(bool, bool), ep: &usize, kp: &usize) {
@@ -599,7 +599,19 @@ impl BoardState {
         score
     }
 
-    pub fn gen_captures(&mut self) {
+    pub fn gen_captures(&mut self) -> Vec<Move> {
+        let move_list = self.gen_move();
+        let mut captures: Vec<Move> = vec![];
+        for i in 0..move_list.len() {
+            if self.board[move_list[i].to].is_opponent_piece() {
+                captures.push(move_list[i]);
+            }
+        }
+        captures
+    }
+
+
+    pub fn gen_att_map(&mut self) {
         let mut pin = 0;
         let mut check = 0;
         self.pinned = [(0, 0); 8];

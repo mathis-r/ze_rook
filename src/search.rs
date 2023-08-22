@@ -8,7 +8,7 @@ use crate::Board;
 pub fn alphabeta(boardstate: &mut BoardState, mut alpha: i32, beta: i32, depth: usize, tt: &mut HashMap<Board,(Move, i32, i32)>, depthmax: &usize, think: &Duration, start: &Instant, move_prv_iter: &Option<Move>) -> (i32,Option<Move>){
     let bestmove: Option<Move>;
     if depth == 0 {
-        return (boardstate.evaluate_pos(), None);
+        return (quiesce(boardstate, alpha, beta, think, start, move_prv_iter), None);
     }
     if start.elapsed() > (*think / 125) * 100 {
         match move_prv_iter {
@@ -112,4 +112,47 @@ pub fn alphabeta(boardstate: &mut BoardState, mut alpha: i32, beta: i32, depth: 
             }
         }
     (alpha, bestmove)
+}
+
+fn quiesce(boardstate: &mut BoardState, mut alpha: i32, beta: i32, think: &Duration, start: &Instant, move_prv_iter: &Option<Move>) -> i32 {
+    if start.elapsed() > (*think / 125) * 100 {
+        match move_prv_iter {
+            Some(_mv) => return 999999,
+            _ => (),
+        };
+    }
+    let stand_pat = boardstate.evaluate_pos();
+    if stand_pat >= beta {
+        return beta;
+    }
+    if alpha < stand_pat {
+        alpha = stand_pat;
+    }
+    let captures = boardstate.gen_captures();
+    for i in 0..captures.len() {
+        let dest = boardstate.board[captures[i].to];
+        let ori_myc = boardstate.myc;
+        let ori_oppc = boardstate.oppc;
+        let ep = boardstate.ep;
+        let kp = boardstate.kp;
+        boardstate.apply_move(&captures[i]);
+        boardstate.rotate();
+        let sc = quiesce(boardstate, -beta, -alpha, think, start, move_prv_iter);
+        let score = -sc;
+        if sc == 999999 {
+            boardstate.rotate();
+            boardstate.unmake(&captures[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
+            return 999999;
+        }
+        boardstate.rotate();
+        boardstate.unmake(&captures[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
+
+        if score >= beta {
+            return beta;
+        }
+        if score > alpha {
+           alpha = score;
+        }
+    }
+    return alpha;
 }

@@ -23,10 +23,10 @@ I made this engine because I wanted to know how they work, if you want to do the
 - No 3 moves draw rule, or 50 moves draw rule
 
 ## Currently, it doesn't have :
-- [Quiescence Search](https://www.chessprogramming.org/Quiescence_Search), so it doesn't lose pieces randomly
-- ~~[Iterative Deepening](https://www.chessprogramming.org/Iterative_Deepening), to make it search faster and to make it easier to implement a time limit to the search (currently it does a 4 [ply](https://www.chessprogramming.org/Ply) search because it's fast and it results in "correct" moves)~~ DONE !
+- ~~[Quiescence Search](https://www.chessprogramming.org/Quiescence_Search), so it doesn't lose pieces randomly~~ DONE!
+- ~~[Iterative Deepening](https://www.chessprogramming.org/Iterative_Deepening), to make it search faster and to make it easier to implement a time limit to the search (currently it does a 4 [ply](https://www.chessprogramming.org/Ply) search because it's fast and it results in "correct" moves)~~ DONE!
 
-## If you want a small, but powerfull engine :
-I can only recommand you to see [Sunfish](https://github.com/thomasahle/sunfish), and its ports in [Rust](https://github.com/Recursing/sunfish_rs) or [Go](https://github.com/zserge/carnatus). This engine is more a proof a concept than anything, but at least it "works"
+## If you want a small, but powerful engine :
+I can only recommend you to see [Sunfish](https://github.com/thomasahle/sunfish), and its ports in [Rust](https://github.com/Recursing/sunfish_rs) or [Go](https://github.com/zserge/carnatus). This engine is more a proof a concept than anything, but at least it "works"
 
 The name ZE_ROOK comes from a meme : "*...and the idea is to sacrifice* ***THE ROOOOOOK!***" (in the repo)

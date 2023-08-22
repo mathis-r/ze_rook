@@ -56,7 +56,7 @@ fn main() {
                     };
                     println!("Nodes searched: {}", perft(&depthmax, &depthmax, &mut boardstate));
                     boardstate.rotate();
-                    boardstate.gen_captures();
+                    boardstate.gen_att_map();
                     boardstate.rotate();
                     continue;
                 }
@@ -121,7 +121,7 @@ fn main() {
                     None => break,
                 }
                 boardstate.rotate();
-                boardstate.gen_captures();
+                boardstate.gen_att_map();
                 boardstate.rotate();
             }
             match move_bfr_string {
@@ -143,7 +143,7 @@ fn main() {
                 None => println!("bestmove (none)"),
             }
             boardstate.rotate();
-            boardstate.gen_captures();
+            boardstate.gen_att_map();
             boardstate.rotate();
         } else if args.len() >=2 {
             if args[..2] == ["position", "startpos"] {
