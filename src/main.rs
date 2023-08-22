@@ -27,7 +27,7 @@ fn main() {
         io::stdin().read_line(&mut input).expect("Failed to read line");
         let args: Vec<&str> = input.trim().split(' ').collect();
         if args[0] == "uci".to_string() {
-            println!("id name ZE_ROOK v0.4");
+            println!("id name ZE_ROOK v0.5");
             println!("uciok");
         } else if args[0] == "isready" {
             println!("readyok");
