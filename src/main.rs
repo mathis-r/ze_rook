@@ -18,7 +18,7 @@ use crate::piece::Prom;
 use ze_rook::MATEUPPER;
 
 fn main() {
-    let mut tt: HashMap<Board,(Move, i32, i32)> = HashMap::new();
+    let mut tt: HashMap<Board,(Vec<Move>, i32, i32)> = HashMap::new();
     let (mut wtime, mut winc) = (60000, 0);
     let (mut btime, mut binc): (i64, i64);
     let mut boardstate = BoardState::new();
@@ -39,6 +39,8 @@ fn main() {
             tt.clear();
             tt.shrink_to_fit();
             boardstate = BoardState::new();
+        } else if args[0] == "eval" {
+            println!("{}", boardstate.evaluate_pos());
         } else if args[0] == "go" {
             if args.len() >= 3 {
                 if args[1] == "perft" {
@@ -91,9 +93,9 @@ fn main() {
             let start = Instant::now();
             let mut move_bfr_string: Option<Move> = None;
             let mut move_prv_iter: Option<Move> = None;
-            for depthmax in 1..1000 {
+            for depthmax in 1..129 {
                 let scmv = alphabeta(&mut boardstate, -MATEUPPER, MATEUPPER, depthmax, &mut tt, &depthmax, &think, &start, &move_prv_iter);
-                move_bfr_string = scmv.1;
+                move_bfr_string = scmv.1.get(0).copied();
                 if scmv.0 == 999999 {
                     move_bfr_string = move_prv_iter;
                     break;
@@ -101,12 +103,15 @@ fn main() {
                 if start.elapsed() > (think / 125) * 100 {
                     break;
                 }
+                let mut move_str;
                 match move_bfr_string {
                     Some(mv) => {
                         move_prv_iter = move_bfr_string;
                         let (mut i, mut j) = (mv.from, mv.to);
+                        let mut k = 0;
                         if boardstate.color == 'b' {
                             (i, j) = (119-i, 119-j);
+                            k+=1;
                         }
                         let prom = match mv.prom {
                             Some(Prom::Q) => "q",
@@ -115,7 +120,22 @@ fn main() {
                             Some(Prom::N) => "n",
                             _ => "",
                         };
-                        let move_str = format!("{}{}{}", render(i as i32), render(j as i32), prom);
+                        move_str = format!("{}{}{}", render(i as i32), render(j as i32), prom);
+                        for pv in 1..scmv.1.len() {
+                            k+=1;
+                            (i, j) = (scmv.1[pv].from, scmv.1[pv].to);
+                            if k % 2 == 1 {
+                                (i, j) = (119-i, 119-j);
+                            }
+                            let prom = match scmv.1[pv].prom {
+                                Some(Prom::Q) => "q",
+                                Some(Prom::R) => "r",
+                                Some(Prom::B) => "b",
+                                Some(Prom::N) => "n",
+                                _ => "",
+                            };
+                            move_str = format!("{move_str} {}{}{}", render(i as i32), render(j as i32), prom);
+                        }
                         println!("info depth {} score cp {} pv {}", depthmax, scmv.0, move_str);
                         },
                     None => break,
