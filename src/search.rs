@@ -89,8 +89,7 @@ pub fn alphabeta(boardstate: &mut BoardState, mut alpha: i32, beta: i32, depth: 
             },
             _ => {
                 if score >= beta {
-                    bestmove = vec![move_list[i]];
-                    (*tt).insert(current_board, (bestmove.clone(), depth as i32, beta));
+                    (*tt).remove(&current_board);
                     return (beta, vec![]);
                 }
                 if score > alpha {
@@ -112,7 +111,7 @@ fn quiesce(boardstate: &mut BoardState, mut alpha: i32, beta: i32, think: &Durat
             _ => (),
         };
     }
-    let mut stand_pat = boardstate.evaluate_pos();
+    let stand_pat = boardstate.evaluate_pos();
     if stand_pat >= beta {
         return beta;
     }
@@ -129,22 +128,19 @@ fn quiesce(boardstate: &mut BoardState, mut alpha: i32, beta: i32, think: &Durat
         boardstate.apply_move(&captures[i]);
         boardstate.rotate();
         let sc = quiesce(boardstate, -beta, -alpha, think, start, move_prv_iter);
-        let score = -sc;
-        if sc == 999999 {
-            boardstate.rotate();
-            boardstate.unmake(&captures[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
-            return 999999;
-        }
         boardstate.rotate();
         boardstate.unmake(&captures[i], &dest, &ori_myc, &ori_oppc, &ep, &kp);
+        let score = -sc;
+        if sc == 999999 {
+            return 999999;
+        }
 
         if score >= beta {
             return beta;
         }
         if score > alpha {
            alpha = score;
-           stand_pat = alpha;
         }
     }
-    return stand_pat;
+    return alpha;
 }
