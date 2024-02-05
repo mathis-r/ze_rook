@@ -28,5 +28,3 @@ I made this engine because I wanted to know how they work, if you want to do the
 
 ## If you want a small, but powerful engine :
 I can only recommend you to see [Sunfish](https://github.com/thomasahle/sunfish), and its ports in [Rust](https://github.com/Recursing/sunfish_rs) or [Go](https://github.com/zserge/carnatus). This engine is more a proof a concept than anything, but at least it "works"
-
-The name ZE_ROOK comes from a meme : "*...and the idea is to sacrifice* ***THE ROOOOOOK!***" (in the repo)
